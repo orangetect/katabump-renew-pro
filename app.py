@@ -36,7 +36,7 @@ def send_tg_message(status_icon, status_text, time_left=""):
         masked_email = EMAIL[:2] + '****'
         
     text = (
-        f"🇫🇷 katabump 续期通知\n\n"
+        f"🇫🇷 katabump plus 续期通知\n\n"
         f"{status_icon} {status_text}\n"
         f"👤 续期账户: {masked_email}\n"
         f"⏱️ 续期时间: {current_time_str}"
@@ -303,7 +303,24 @@ def login(sb) -> bool:
     js_fill_input(sb, 'input[type="password"]', PASSWORD)
     time.sleep(3)
 
-    # 等待 Turnstile 验证框出现（最多 10 秒）
+    print("☑️ 勾选 Remember me...")
+    try:
+        res = sb.execute_script("""
+            (function() {
+                var cb = document.querySelector('input[type="checkbox"][name*="remember"], input#remember, input[type="checkbox"]');
+                if (!cb) return 'not_found';
+                if (cb.checked) return 'already_checked';
+                cb.checked = true;
+                cb.dispatchEvent(new Event('change', { bubbles: true }));
+                cb.dispatchEvent(new Event('click', { bubbles: true }));
+                return 'checked_now';
+            })()
+        """)
+        print(f"ℹ️ Remember me 状态: {res}")
+        time.sleep(0.5)
+    except Exception as e:
+        print(f"ℹ️ 勾选 Remember me 异常: {e}")
+
     print("⏳ 等待 Turnstile 验证框出现...")
     ts_found = False
     for i in range(10):
